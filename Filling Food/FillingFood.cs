@@ -3,17 +3,12 @@
 // License:         MIT License (http://www.opensource.org/licenses/mit-license.php)
 // Author:          Ralzar
 
-using DaggerfallConnect;
 using DaggerfallWorkshop.Game;
 using DaggerfallWorkshop.Game.Entity;
-using DaggerfallWorkshop.Game.Items;
 using DaggerfallWorkshop.Game.MagicAndEffects;
 using DaggerfallWorkshop.Game.Utility.ModSupport;
-using DaggerfallWorkshop.Game.Utility.ModSupport.ModSettings;
 using UnityEngine;
 using DaggerfallWorkshop;
-using DaggerfallConnect.Arena2;
-using DaggerfallWorkshop.Utility;
 
 namespace FillingFood
 {
