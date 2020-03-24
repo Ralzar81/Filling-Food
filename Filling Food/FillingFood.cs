@@ -1,7 +1,8 @@
-// Project:         Climates & Cloaks mod for Daggerfall Unity (http://www.dfworkshop.net)
-// Copyright:       Copyright (C) 2019 Ralzar
+// Project:         Filling Food mod for Daggerfall Unity (http://www.dfworkshop.net)
+// Copyright:       Copyright (C) 2020 Ralzar
 // License:         MIT License (http://www.opensource.org/licenses/mit-license.php)
 // Author:          Ralzar
+
 
 using DaggerfallWorkshop.Game;
 using DaggerfallWorkshop.Game.Entity;
@@ -9,6 +10,23 @@ using DaggerfallWorkshop.Game.MagicAndEffects;
 using DaggerfallWorkshop.Game.Utility.ModSupport;
 using UnityEngine;
 using DaggerfallWorkshop;
+
+using DaggerfallConnect;
+using DaggerfallWorkshop.Game;
+using DaggerfallWorkshop.Game.UserInterface;
+using DaggerfallWorkshop.Game.Utility;
+using DaggerfallWorkshop.Game.Entity;
+using DaggerfallWorkshop.Game.Items;
+using DaggerfallWorkshop.Game.MagicAndEffects;
+using DaggerfallWorkshop.Game.Utility.ModSupport;
+using DaggerfallWorkshop.Game.Utility.ModSupport.ModSettings;
+using UnityEngine;
+using System;
+using DaggerfallWorkshop;
+using DaggerfallConnect.Arena2;
+using DaggerfallWorkshop.Utility;
+using DaggerfallWorkshop.Game.UserInterfaceWindows;
+using DaggerfallWorkshop.Game.Serialization;
 
 namespace FillingFood
 {
@@ -25,6 +43,8 @@ namespace FillingFood
             var go = new GameObject(mod.Title);
             go.AddComponent<FillingFood>();
 
+            DaggerfallUnity.Instance.ItemHelper.RegisterItemUseHander(531, EatProvisions);
+            DaggerfallUnity.Instance.ItemHelper.RegisterCustomItem(531, ItemGroups.UselessItems2);
         }
 
         void Awake()
@@ -36,13 +56,15 @@ namespace FillingFood
         static PlayerEntity playerEntity = GameManager.Instance.PlayerEntity;
         static private bool hungry = true;
         static private int foodCount = 0;
-
+        static private uint gameMinutes = DaggerfallUnity.Instance.WorldTime.DaggerfallDateTime.ToClassicDaggerfallTime();
+        static private uint ateTime = GameManager.Instance.PlayerEntity.LastTimePlayerAteOrDrankAtTavern;
+        static private uint hunger = (gameMinutes - ateTime);
 
         void Update()
         {
-            uint gameMinutes = DaggerfallUnity.Instance.WorldTime.DaggerfallDateTime.ToClassicDaggerfallTime();
-            uint ateTime = GameManager.Instance.PlayerEntity.LastTimePlayerAteOrDrankAtTavern;
-            uint hunger = (gameMinutes - ateTime);
+            gameMinutes = DaggerfallUnity.Instance.WorldTime.DaggerfallDateTime.ToClassicDaggerfallTime();
+            ateTime = GameManager.Instance.PlayerEntity.LastTimePlayerAteOrDrankAtTavern;
+            hunger = (gameMinutes - ateTime);
             if (hunger <= 240 && hungry)
             {
                 hungry = false;
@@ -53,16 +75,54 @@ namespace FillingFood
         }
 
 
+        static bool EatProvisions(DaggerfallUnityItem item, ItemCollection collection)
+        {
+            if (hunger >= 240)
+            {
+                GameManager.Instance.PlayerEntity.LastTimePlayerAteOrDrankAtTavern = gameMinutes-120;
+                collection.RemoveItem(item);
+            }
+            else
+            {
+                DaggerfallUI.MessageBox(HardStrings.youAreNotHungry);
+            }
+            return true;
+        }
+
+        static private void FoodRot()
+        {
+            for (int i = 0; i < GameManager.Instance.PlayerEntity.Items.Count; i++)
+            {
+                DaggerfallUnityItem item = GameManager.Instance.PlayerEntity.Items.GetItem(i);
+
+
+                if (item.TemplateIndex > 530 && item.TemplateIndex < 540)
+                {
+                    item.LowerCondition(1);
+                }
+            }
+        }
+
+        private static int rotCounter = 0;
+
+        private static void FoodRot_OnNewMagicRound()
+        {
+            if (!SaveLoadManager.Instance.LoadInProgress)
+            {
+                rotCounter++;
+                if (rotCounter > 60)
+                {
+                    FoodRot();
+                    rotCounter = 0;
+                }
+            }
+        }
 
         private static void FoodEffects_OnNewMagicRound()
         {
             Debug.Log("[FillingFood Food] Round Start");
-
-            uint gameMinutes = DaggerfallUnity.Instance.WorldTime.DaggerfallDateTime.ToClassicDaggerfallTime();
-            uint ateTime = GameManager.Instance.PlayerEntity.LastTimePlayerAteOrDrankAtTavern;
-            uint hunger = (gameMinutes - ateTime);
-
-            if ( hunger <= 240)
+            Debug.Log("[Filling Food] Hunger = " + hunger.ToString());
+            if ( hunger <= 239)
             {
                 foodCount += (200 - (int)hunger);
                 Debug.Log(foodCount.ToString());

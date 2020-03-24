@@ -1,0 +1,15 @@
+{
+    "ModTitle": "Filling Food",
+    "ModVersion": "1.2",
+    "ModAuthor": "Ralzar",
+    "ContactInfo": "forums.dfworkshop.com",
+    "DFUnity_Version": "0.10.17",
+    "ModDescription": "When eating or drinking in a tavern, you gain a small Fatigue regeneration for a while.",
+    "GUID": "2f0967b0-3400-4bff-837c-b1776a2d6bd7",
+    "Files": [
+        "Assets/Game/Mods/Filling Food/FillingFood.cs",
+        "Assets/Game/Mods/Filling Food/ItemTemplates.json"
+    ],
+    "Contributes": null,
+    "Dependencies": null
+}
