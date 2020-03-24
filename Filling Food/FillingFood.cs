@@ -43,11 +43,23 @@ namespace FillingFood
             go.AddComponent<FillingFood>();
 
             EntityEffectBroker.OnNewMagicRound += FoodRot_OnNewMagicRound;
-            DaggerfallUnity.Instance.ItemHelper.RegisterItemUseHander(531, EatFood);
-            DaggerfallUnity.Instance.ItemHelper.RegisterCustomItem(531, ItemGroups.UselessItems2);
 
-            DaggerfallUnity.Instance.ItemHelper.RegisterItemUseHander(532, EatFood);
-            DaggerfallUnity.Instance.ItemHelper.RegisterCustomItem(532, ItemGroups.UselessItems2, typeof(ItemApple));
+            ItemHelper itemHelper = DaggerfallUnity.Instance.ItemHelper;
+
+            itemHelper.RegisterCustomItem(531, ItemGroups.UselessItems2);
+            itemHelper.RegisterItemUseHander(531, EatFood);
+            itemHelper.RegisterCustomItem(532, ItemGroups.UselessItems2);
+            itemHelper.RegisterItemUseHander(532, EatFood);
+            itemHelper.RegisterCustomItem(533, ItemGroups.UselessItems2);
+            itemHelper.RegisterItemUseHander(533, EatFood);
+            itemHelper.RegisterCustomItem(534, ItemGroups.UselessItems2);
+            itemHelper.RegisterItemUseHander(534, EatFood);
+            itemHelper.RegisterCustomItem(535, ItemGroups.UselessItems2);
+            itemHelper.RegisterItemUseHander(535, EatFood);
+            itemHelper.RegisterCustomItem(536, ItemGroups.UselessItems2);
+            itemHelper.RegisterItemUseHander(536, EatFood);
+            itemHelper.RegisterCustomItem(537, ItemGroups.UselessItems2);
+            itemHelper.RegisterItemUseHander(537, EatFood);
         }
 
         void Awake()
@@ -67,7 +79,7 @@ namespace FillingFood
         {
             gameMinutes = DaggerfallUnity.Instance.WorldTime.DaggerfallDateTime.ToClassicDaggerfallTime();
             ateTime = GameManager.Instance.PlayerEntity.LastTimePlayerAteOrDrankAtTavern;
-            hunger = (gameMinutes - ateTime);
+            hunger = gameMinutes - ateTime;
             if (hunger <= 240 && hungry)
             {
                 hungry = false;
@@ -78,37 +90,42 @@ namespace FillingFood
         }
 
 
-        static bool EatFood(DaggerfallUnityItem item, ItemCollection collection)
+        public static bool EatFood(DaggerfallUnityItem item, ItemCollection collection)
         {
-            if (hunger >= 240)
+            uint cal = 240;
+            if (item.TemplateIndex == 531) //Provisions
             {
-                uint cal = 240;
-                if (item.TemplateIndex == 531) //Provisions
-                {
-                    cal -= 120; 
-                }
-                else if (item.TemplateIndex == 532 || item.TemplateIndex == 533) //Apple or Orange
-                {
-                    cal -= 60;
-                }
-                else if (item.TemplateIndex == 534) //Bread
-                {
-                    cal -= 120;
-                }
-                else if (item.TemplateIndex == 535) //Fish
-                {
-                    cal -= 180;
-                }
-                else if (item.TemplateIndex == 536) //Salted Fish
-                {
-                    cal -= 120;
-                }
-                else if (item.TemplateIndex == 537) //Meat
-                {
-                    cal -= 240;
-                }
+                cal -= 120;
+            }
+            else if (item.TemplateIndex == 532 || item.TemplateIndex == 533) //Apple or Orange
+            {
+                cal -= 60;
+            }
+            else if (item.TemplateIndex == 534) //Bread
+            {
+                cal -= 120;
+            }
+            else if (item.TemplateIndex == 535) //Fish
+            {
+                cal -= 180;
+            }
+            else if (item.TemplateIndex == 536) //Salted Fish
+            {
+                cal -= 120;
+            }
+            else if (item.TemplateIndex == 537) //Meat
+            {
+                cal -= 240;
+            }
 
-                GameManager.Instance.PlayerEntity.LastTimePlayerAteOrDrankAtTavern = gameMinutes-cal;
+            if (hunger > 240)
+            {
+                GameManager.Instance.PlayerEntity.LastTimePlayerAteOrDrankAtTavern = gameMinutes - cal;
+                collection.RemoveItem(item);
+            }
+            else if (hunger > 240-cal )
+            {
+                GameManager.Instance.PlayerEntity.LastTimePlayerAteOrDrankAtTavern += (240 - cal);
                 collection.RemoveItem(item);
             }
             else
@@ -128,9 +145,12 @@ namespace FillingFood
                     DaggerfallUnityItem item = playerItems.GetItem(i);
                     if (item.TemplateIndex > 530 && item.TemplateIndex < 540)
                     {
-                        rot = Random.Range(0, 4);
-                        item.LowerCondition(rot);
-                        Debug.LogFormat("[Filling Food] {0} rotted {1}", item.shortName, rot);
+                        if (item.currentCondition >= 1)
+                        {
+                            rot = Random.Range(0, 4);
+                            item.LowerCondition(rot);
+                            Debug.LogFormat("[Filling Food] {0} rotted {1}", item.shortName, rot);
+                        }                        
                     }
                 }
             }
@@ -176,154 +196,6 @@ namespace FillingFood
                 Debug.Log("[FillingFood Food] De-registering from OnNewMagicRound");
             }
             Debug.Log("[FillingFood Food] Round End");
-        }
-    }
-
-
-    public class ItemProvisions : DaggerfallUnityItem
-    {
-        public const int templateIndex = 531;
-
-        public ItemProvisions() : base(ItemGroups.UselessItems2, templateIndex)
-        {
-        }
-
-        public override bool IsStackable()
-        {
-            return true;
-        }
-
-        public override ItemData_v1 GetSaveData()
-        {
-            ItemData_v1 data = base.GetSaveData();
-            data.className = typeof(ItemProvisions).ToString();
-            return data;
-        }
-    }
-
-    public class ItemApple : DaggerfallUnityItem
-    {
-        public const int templateIndex = 532;
-
-        public ItemApple() : base(ItemGroups.UselessItems2, templateIndex)
-        {
-        }
-
-        public override bool IsStackable()
-        {
-            return true;
-        }
-
-        public override ItemData_v1 GetSaveData()
-        {
-            ItemData_v1 data = base.GetSaveData();
-            data.className = typeof(ItemApple).ToString();
-            return data;
-        }
-    }
-
-    public class ItemOrange : DaggerfallUnityItem
-    {
-        public const int templateIndex = 533;
-
-        public ItemOrange() : base(ItemGroups.UselessItems2, templateIndex)
-        {
-        }
-
-        public override bool IsStackable()
-        {
-            return true;
-        }
-
-        public override ItemData_v1 GetSaveData()
-        {
-            ItemData_v1 data = base.GetSaveData();
-            data.className = typeof(ItemOrange).ToString();
-            return data;
-        }
-    }
-
-    public class ItemBread : DaggerfallUnityItem
-    {
-        public const int templateIndex = 534;
-
-        public ItemBread() : base(ItemGroups.UselessItems2, templateIndex)
-        {
-        }
-
-        public override bool IsStackable()
-        {
-            return true;
-        }
-
-        public override ItemData_v1 GetSaveData()
-        {
-            ItemData_v1 data = base.GetSaveData();
-            data.className = typeof(ItemBread).ToString();
-            return data;
-        }
-    }
-
-    public class ItemFish : DaggerfallUnityItem
-    {
-        public const int templateIndex = 535;
-
-        public ItemFish() : base(ItemGroups.UselessItems2, templateIndex)
-        {
-        }
-
-        public override bool IsStackable()
-        {
-            return true;
-        }
-
-        public override ItemData_v1 GetSaveData()
-        {
-            ItemData_v1 data = base.GetSaveData();
-            data.className = typeof(ItemFish).ToString();
-            return data;
-        }
-    }
-
-    public class ItemSaltedFish : DaggerfallUnityItem
-    {
-        public const int templateIndex = 536;
-
-        public ItemSaltedFish() : base(ItemGroups.UselessItems2, templateIndex)
-        {
-        }
-
-        public override bool IsStackable()
-        {
-            return true;
-        }
-
-        public override ItemData_v1 GetSaveData()
-        {
-            ItemData_v1 data = base.GetSaveData();
-            data.className = typeof(ItemSaltedFish).ToString();
-            return data;
-        }
-    }
-
-    public class ItemMeat : DaggerfallUnityItem
-    {
-        public const int templateIndex = 537;
-
-        public ItemMeat() : base(ItemGroups.UselessItems2, templateIndex)
-        {
-        }
-
-        public override bool IsStackable()
-        {
-            return true;
-        }
-
-        public override ItemData_v1 GetSaveData()
-        {
-            ItemData_v1 data = base.GetSaveData();
-            data.className = typeof(ItemMeat).ToString();
-            return data;
         }
     }
 }
