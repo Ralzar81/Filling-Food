@@ -21,7 +21,8 @@ using DaggerfallWorkshop.Game.MagicAndEffects;
 using DaggerfallWorkshop.Game.Utility.ModSupport;
 using DaggerfallWorkshop.Game.Utility.ModSupport.ModSettings;
 using UnityEngine;
-using DaggerfallWorkshop;
+using DaggerfallWorkshop.Game.Questing;
+using DaggerfallWorkshop.Game.Questing.Actions;
 using DaggerfallConnect.Arena2;
 using DaggerfallWorkshop.Utility;
 using DaggerfallWorkshop.Game.UserInterfaceWindows;
@@ -62,12 +63,36 @@ namespace FillingFood
             itemHelper.RegisterItemUseHander(537, EatFood);
         }
 
+        DaggerfallUnity dfUnity;
+        PlayerEnterExit playerEnterExit;
+
+        //Hunting code WIP
+        //bool ambientText = false;
+        //float lastTickTime;
+        //float tickTimeInterval;
+        //int huntChance = 80;
+        //int textSpecificChance = 50;
+        //float stdInterval = 10f;
+        //float postTextInterval = 60f;
+        //int textDisplayTime = 3;
+
+
+        //Hunting code WIP
+        //void Start()
+        //{
+        //    dfUnity = DaggerfallUnity.Instance;
+        //    playerEnterExit = GameManager.Instance.PlayerEnterExit;
+        //    lastTickTime = Time.unscaledTime;
+        //    tickTimeInterval = stdInterval;
+        //}
+
         void Awake()
         {
             mod.IsReady = true;
             Debug.Log("[FillingFood Food] Mod Is Ready");
         }
 
+        //Hunting Quest test
         static PlayerEntity playerEntity = GameManager.Instance.PlayerEntity;
         static private bool hungry = true;
         static private int foodCount = 0;
@@ -77,6 +102,29 @@ namespace FillingFood
 
         void Update()
         {
+            //if (!dfUnity.IsReady || !playerEnterExit || GameManager.IsGamePaused)
+            //    return;
+
+            ////Hunting code WIP
+            //if (!GameManager.Instance.PlayerGPS.IsPlayerInLocationRect
+            //    && Time.unscaledTime > lastTickTime + tickTimeInterval
+            //    && DaggerfallUnity.Instance.WorldTime.Now.IsDay
+            //    && !GameManager.IsGamePaused
+            //    )
+            //{
+            //    lastTickTime = Time.unscaledTime;
+            //    tickTimeInterval = stdInterval;
+            //    Debug.Log("[Filling Food] Rolling for hunting chance.");
+
+            //    if (Dice100.SuccessRoll(huntChance) && !GameManager.Instance.AreEnemiesNearby())
+            //    {
+            //        Debug.Log("[Filling Food] Hunting Success");
+            //        QuestMachine.Instance.StartQuest("HFQ00");
+            //        tickTimeInterval = postTextInterval;
+                    
+            //    }
+            //}
+
             gameMinutes = DaggerfallUnity.Instance.WorldTime.DaggerfallDateTime.ToClassicDaggerfallTime();
             ateTime = GameManager.Instance.PlayerEntity.LastTimePlayerAteOrDrankAtTavern;
             hunger = gameMinutes - ateTime;

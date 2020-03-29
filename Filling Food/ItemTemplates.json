@@ -3,9 +3,9 @@
         "index": 531,
         "name": "Provisions",
         "baseWeight": 2.0,
-        "hitPoints": 336,
+        "hitPoints": 600,
         "capacityOrTarget": 0,
-        "basePrice": 5,
+        "basePrice": 10,
         "enchantmentPoints": 0,
         "rarity": 1,
         "variants": 0,
@@ -119,7 +119,7 @@
         "playerTextureArchive": 0,
         "playerTextureRecord": 0
     },
-            {
+    {
         "index": 537,
         "name": "Meat",
         "baseWeight": 2,
